@@ -1,195 +1,460 @@
-# 🚀 Financial Forecasting Frontier: Distributed ML
+# Financial Forecasting Frontier – Distributed Machine Learning
 
-### Setup & Execution Guide
+A distributed data engineering and machine learning project focused on banking customer analytics and term deposit subscription prediction using Apache Spark, Hadoop, Hive, and Python.
 
----
+## Project Overview
 
-## 🧱 Tech Stack (Docker Images)
+The **Financial Forecasting Frontier** project demonstrates how large-scale banking data can be processed, analyzed, and used for predictive modelling through distributed computing technologies.
 
-All services use stable, official images:
+The project includes:
+- Distributed data processing using Apache Spark.
+- Banking data analysis and exploratory data analysis (EDA).
+- Machine learning using Random Forest.
+- Hadoop HDFS and Hive integration.
+- MapReduce-style data analysis.
+- Spark Structured Streaming for simulated real-time analytics.
+- Data parallelism and concurrent analytical processing.
 
-| Service    | Image                               | Source          |
-| ---------- | ----------------------------------- | --------------- |
-| Spark      | spark:3.5.0-scala2.12-java17-ubuntu | Docker Official |
-| Jupyter    | jupyter/pyspark-notebook:latest     | Jupyter Project |
-| Hadoop     | apache/hadoop:3                     | Apache Official |
-| Hive       | apache/hive:4.0.0                   | Apache Official |
-| PostgreSQL | postgres:15-alpine                  | Docker Official |
+## Objectives
 
----
+1. Analyze banking customer information.
+2. Identify patterns influencing term deposit subscriptions.
+3. Build a machine learning model to predict customer subscription outcomes.
+4. Demonstrate distributed data processing using Spark and Hadoop.
+5. Implement simulated streaming analytics.
+6. Explore parallel execution and performance monitoring.
 
-## ⚙️ Prerequisites
+## Technology Stack
 
-Install Docker Desktop:
-👉 https://www.docker.com/products/docker-desktop
+| Technology | Purpose |
+|---|---|
+| Python | Programming and data analysis |
+| Apache Spark | Distributed data processing |
+| PySpark MLlib | Machine learning |
+| Hadoop HDFS | Distributed storage |
+| Apache Hive | SQL-based data querying |
+| MapReduce | Distributed processing concepts |
+| PostgreSQL | Hive Metastore database |
+| Docker Compose | Container orchestration |
+| Jupyter Notebook | Interactive development |
+| Pandas | Data manipulation |
+| Scikit-learn concepts | Machine learning workflow |
 
-### Recommended Docker Settings
+## System Architecture
 
-* Memory: **8 GB minimum** (10 GB recommended)
-* CPUs: **4**
-* Apply changes and restart Docker
+```text
+                 Banking Dataset
+                     bank.csv
+                        |
+          +-------------+-------------+
+          |                           |
+     Apache Spark                 Hadoop HDFS
+          |                           |
+    Data Processing               Data Storage
+          |                           |
+     Exploratory                     Hive
+    Data Analysis                 SQL Queries
+          |
+    Machine Learning
+          |
+    Random Forest
+          |
+   Subscription Prediction
+          |
+   Streaming Analytics
+          |
+   Data Parallelism
+          |
+    Analytical Results
+```
 
----
+**Note:** Spark processing scripts read the dataset from the Docker-mounted local `/data/bank.csv` path. HDFS and Hive are demonstrated through separate storage and querying workflows.
 
-## 🟢 Step 1 — Start the Cluster
+## Repository Structure
 
-Navigate to the project directory:
+```text
+Financial-Forecasting-Frontier-Distributed-ML/
+│
+├── README.md
+├── docker-compose.yml
+├── .gitignore
+│
+├── docs/
+│   └── Financial Forecasting Frontier.docx
+│
+├── Notebook/
+│   └── colab_notebooks/
+│
+├── data_parallelism/
+│   └── data_parallelism.py
+│
+├── hadoop_hive/
+│   ├── hive-site.xml
+│   ├── hive_queries.sql
+│   └── setup_hdfs.sh
+│
+├── mapreduce/
+│   ├── mr_runner.py
+│   └── generate_mr_scripts.py
+│
+├── spark_ml/
+│   └── spark_ml.py
+│
+├── spark_processing/
+│   └── spark_processing.py
+│
+└── spark_streaming/
+    ├── spark_streaming.py
+    └── stream_simulator.py
+```
+
+## Dataset
+
+The project uses a banking marketing dataset named:
+
+`bank.csv`
+
+The dataset contains customer information and marketing campaign details.
+
+### Important Features
+
+| Feature | Description |
+|---|---|
+| age | Customer age |
+| job | Customer occupation |
+| marital | Marital status |
+| education | Education level |
+| balance | Average yearly balance |
+| housing | Housing loan status |
+| loan | Personal loan status |
+| contact | Contact communication type |
+| month | Last contact month |
+| duration | Last contact duration |
+| campaign | Number of contacts during campaign |
+| pdays | Days since previous contact |
+| previous | Number of previous contacts |
+| poutcome | Previous campaign outcome |
+| y | Term deposit subscription (yes/no) |
+
+**Target Variable:** `y`
+
+- `yes` – Customer subscribed to a term deposit.
+- `no` – Customer did not subscribe.
+
+### Dataset Setup
+
+The `data/` directory is excluded from Git using `.gitignore`. Therefore, place your dataset locally:
+
+```text
+project-root/
+└── data/
+    └── bank.csv
+```
+
+Use a dataset you are authorized to use. The dataset is not automatically downloaded by Docker Compose.
+
+## Project Modules
+
+### 1. Exploratory Data Analysis – Apache Spark
+
+File: `spark_processing/spark_processing.py`
+
+This module performs distributed data analysis using PySpark.
+
+Key activities:
+- Load and inspect banking data.
+- Analyze customer demographics.
+- Filter customers based on account balance.
+- Calculate average balance by occupation.
+- Analyze subscription trends by marital status.
+- Calculate subscription rates by education.
+- Analyze default rates by occupation.
+- Group customers by age categories.
+- Generate aggregated analytical results.
+
+### 2. Machine Learning – Random Forest
+
+File: `spark_ml/spark_ml.py`
+
+This module builds a classification model to predict whether a customer will subscribe to a term deposit.
+
+**Machine Learning Workflow:**
+
+1. Load banking dataset.
+2. Inspect missing values.
+3. Handle outliers using the IQR method for balance.
+4. Transform categorical variables using StringIndexer.
+5. Apply OneHotEncoder.
+6. Assemble features using VectorAssembler.
+7. Scale features using StandardScaler.
+8. Train Random Forest Classifier.
+9. Evaluate model performance.
+10. Perform hyperparameter tuning using CrossValidator.
+
+**Model Configuration:**
+- Algorithm: Random Forest Classifier
+- Number of Trees: 100
+- Maximum Depth: 5
+- Training Data: 80%
+- Testing Data: 20%
+- Cross Validation: 3 Folds
+
+**Evaluation Metrics:**
+- Accuracy
+- AUC
+- F1 Score
+- Confusion Matrix
+
+Actual model performance depends on the dataset and execution environment.
+
+### 3. Hadoop HDFS and Hive
+
+Directory: `hadoop_hive/`
+
+This module demonstrates distributed storage and SQL-based analysis.
+
+Key activities:
+- Store banking data in Hadoop HDFS.
+- Create HDFS directories.
+- Configure Hive Metastore.
+- Connect Hive with PostgreSQL.
+- Execute analytical SQL queries using Hive.
+
+### 4. MapReduce Processing
+
+Directory: `mapreduce/`
+
+This module demonstrates MapReduce-style analytical processing using Python.
+
+Analysis includes:
+- Average balance by occupation.
+- Housing loan distribution by education.
+- Monthly contacts by subscription status.
+- Average call duration by campaign outcome.
+- Customer age and balance analysis.
+
+**Note:** The `mr_runner.py` script performs local Python-based aggregations. It is not itself a distributed Hadoop MapReduce execution. The separate script `generate_mr_scripts.py` prepares Hadoop Streaming commands.
+
+### 5. Spark Structured Streaming
+
+Directory: `spark_streaming/`
+
+This module demonstrates simulated streaming analytics using Apache Spark Structured Streaming.
+
+Key activities:
+- Read customer records in batches.
+- Generate event timestamps.
+- Process incoming CSV files.
+- Perform streaming aggregations.
+- Apply window-based analytics.
+- Handle late-arriving data using watermarking.
+- Generate model predictions through the streaming workflow.
+
+**Note:** The streaming simulator reads the banking CSV dataset and generates batches. It does not connect to a live banking transaction system.
+
+### 6. Data Parallelism
+
+File: `data_parallelism/data_parallelism.py`
+
+This module explores parallel data processing using Apache Spark.
+
+Key activities:
+- Repartition data across Spark partitions.
+- Perform parallel aggregations.
+- Cache frequently used datasets.
+- Execute analytical tasks concurrently.
+- Train a Random Forest model.
+- Monitor CPU and memory utilization.
+
+## Prerequisites
+
+Install the following tools:
+
+- Docker Desktop
+- Docker Compose
+- Git
+- Python 3 (for local Python scripts)
+- Minimum 8 GB RAM recommended
+- At least 4 CPU cores recommended
+
+Docker should have sufficient memory and disk resources to run Spark, Hadoop, Hive, PostgreSQL, and Jupyter simultaneously.
+
+## Installation and Setup
+
+### Step 1: Clone the Repository
 
 ```bash
-cd banking_project
+git clone https://github.com/naman39910/Financial-Forecasting-Frontier-Distributed-ML.git
+
+cd Financial-Forecasting-Frontier-Distributed-ML
+```
+
+### Step 2: Add the Dataset
+
+Create a folder named `data` in the project root and place `bank.csv` inside it.
+
+```text
+data/bank.csv
+```
+
+### Step 3: Start Docker Services
+
+```bash
 docker compose up -d
 ```
 
-⏳ First run may take 3–5 minutes (downloads ~4GB).
-
-### Verify containers
+Check running containers:
 
 ```bash
 docker compose ps
 ```
 
-### Access Web Interfaces
+### Step 4: Access the Services
 
-* Spark Master → http://localhost:8080
-* HDFS UI → http://localhost:9870
-* Hive UI → http://localhost:10002
-* Jupyter Notebook → http://localhost:8888
+| Service | URL | Purpose |
+|---|---|---|
+| Spark Master | http://localhost:8080 | Spark cluster monitoring |
+| HDFS NameNode | http://localhost:9870 | HDFS management |
+| Hive UI | http://localhost:10002 | Hive interface |
+| Jupyter Notebook | http://localhost:8888 | Interactive notebooks |
 
-  * Token: `banking123`
+The configured Jupyter token is `banking123`.
 
----
+### Step 5: Configure HDFS
 
-## 🗂️ Step 2 — HDFS Setup
-
-Wait ~60 seconds after cluster startup:
+Run the setup script:
 
 ```bash
 bash hadoop_hive/setup_hdfs.sh
 ```
 
----
+This script prepares HDFS directories and uploads the banking dataset.
 
-## 🐝 Step 3 — Run Hive Queries
+### Step 6: Execute Hive Queries
+
+Copy the SQL file into the Hive container:
 
 ```bash
-docker cp data/hive_queries.sql hive:/data/hive_queries.sql
+docker cp hadoop_hive/hive_queries.sql hive:/data/hive_queries.sql
+```
 
+Connect to Hive:
+
+```bash
 docker exec -it hive beeline -u 'jdbc:hive2://localhost:10000'
+```
 
+Execute the SQL file:
+
+```sql
 !run /data/hive_queries.sql
-!quit
 ```
 
----
+## Running Spark Modules
 
-## ⚡ Step 4 — Spark Data Processing
+### 1. Spark Data Processing
 
 ```bash
 docker exec spark-master /opt/spark/bin/spark-submit \
-  --master spark://spark-master:7077 \
-  /app/spark_processing/spark_processing.py
+--master spark://spark-master:7077 \
+/app/spark_processing/spark_processing.py
 ```
 
----
-
-## 🤖 Step 5 — Spark ML Pipeline
+### 2. Machine Learning
 
 ```bash
 docker exec spark-master /opt/spark/bin/spark-submit \
-  --master spark://spark-master:7077 \
-  /app/spark_ml/spark_ml.py
+--master spark://spark-master:7077 \
+/app/spark_ml/spark_ml.py
 ```
 
----
-
-## 📡 Step 6 — Spark Streaming
-
-### Terminal 1 (Streaming App)
+### 3. Data Parallelism
 
 ```bash
 docker exec spark-master /opt/spark/bin/spark-submit \
-  --master spark://spark-master:7077 \
-  /app/spark_streaming/spark_streaming.py
+--master spark://spark-master:7077 \
+/app/data_parallelism/data_parallelism.py
 ```
 
-### Terminal 2 (Data Generator)
+The scripts may require additional Python packages inside the relevant container, depending on the execution environment.
 
-```bash
-docker exec spark-master python3 /app/spark_streaming/stream_simulator.py
-```
+## Streaming Execution
 
----
+The streaming simulator and Spark streaming application must both access the same dataset and streaming directory.
 
-## ⚙️ Step 7 — Data Parallelism
+The current Docker Compose configuration mounts the project `data/` directory at different paths in different containers. The simulator uses absolute `/data/...` paths, so its container must have the project data directory mounted at `/data` before execution.
+
+Once the mount paths are aligned, start the Spark streaming application:
 
 ```bash
 docker exec spark-master /opt/spark/bin/spark-submit \
-  --master spark://spark-master:7077 \
-  /app/data_parallelism/data_parallelism.py
+--master spark://spark-master:7077 \
+/app/spark_streaming/spark_streaming.py
 ```
 
----
+Run the simulator in a container where `/data/bank.csv` is available:
 
-## 🧮 Step 8 — MapReduce
+```bash
+python3 spark_streaming/stream_simulator.py
+```
 
-### Option 1: Local Execution (Recommended)
+The simulator generates CSV batches for Spark Structured Streaming to process.
+
+## Running MapReduce Analysis
+
+Run the local Python MapReduce-style analysis:
 
 ```bash
 python mapreduce/mr_runner.py
 ```
 
-### Option 2: Hadoop Streaming
+## Expected Learning Outcomes
 
-```bash
-docker exec namenode hdfs dfs -mkdir -p /user/hadoop/output
-docker cp mapreduce/mr_runner.py namenode:/tmp/mr_runner.py
-```
+Through this project, the following concepts are demonstrated:
 
-Refer to `generate_mr_scripts.py` for detailed Hadoop streaming commands.
+- Distributed computing fundamentals.
+- Apache Spark architecture.
+- DataFrame transformations and aggregations.
+- Machine learning pipeline development.
+- Classification model evaluation.
+- Hadoop distributed storage.
+- Hive SQL querying.
+- Streaming data processing.
+- Data partitioning and parallel execution.
+- Containerized data engineering environments.
 
----
+## Security Considerations
 
-## 🛑 Stopping the Cluster
+This project is configured as a local learning and demonstration environment.
 
-```bash
-docker compose stop        # Pause (keeps data)
-docker compose down -v     # Full reset (removes volumes)
-```
+Before using it in any shared or production environment:
 
----
+- Replace hardcoded passwords and tokens.
+- Do not expose Docker service ports publicly.
+- Configure appropriate Hive authentication.
+- Review HDFS permissions.
+- Use secure secret management.
+- Apply suitable network and access controls.
 
-## 🧰 Troubleshooting Guide
+The credentials in the current Docker configuration are demonstration credentials only.
 
-| Issue                      | Solution                                                 |
-| -------------------------- | -------------------------------------------------------- |
-| Spark image not found      | Ensure latest `docker-compose.yml` is used               |
-| NameNode stuck in SafeMode | `docker exec namenode hdfs dfsadmin -safemode forceExit` |
-| Hive connection refused    | Wait ~2 minutes, then retry                              |
-| Spark Out of Memory        | Increase Docker memory to 10 GB                          |
-| Port already in use        | Modify port mapping in `docker-compose.yml`              |
+## Future Enhancements
 
----
+- Integrate Kafka for event-based streaming.
+- Deploy the project on a cloud platform.
+- Add model comparison with Gradient Boosted Trees and Logistic Regression.
+- Implement model tracking using MLflow.
+- Build an interactive dashboard using Power BI.
+- Add automated model retraining.
+- Implement CI/CD for deployment.
+- Improve security and authentication.
 
-## 📌 Notes
+## Author
 
-* First run is slow due to image downloads.
-* Streaming requires **two terminals** (app + simulator).
-* Ensure Docker has enough memory before running Spark ML.
+**Naman Koolwal**
 
----
+GitHub: https://github.com/naman39910
 
-## ✅ Project Workflow Summary
+## License
 
-1. Start cluster
-2. Load data into HDFS
-3. Run Hive analytics
-4. Execute Spark batch processing
-5. Train ML models
-6. Run streaming pipeline
-7. Test MapReduce jobs
-
----
-
-## 🎯 You're Ready!
-
-Your distributed ML pipeline is now fully operational 🚀
+This project is intended for educational and learning purposes. Add a LICENSE file if you want to specify reuse and distribution terms.
